@@ -5,25 +5,35 @@ const { User, Post, Vote } = require("../../models");
 router.get('/', (req, res) => {
     // Access our User model and run .findAll() method)
     User.findAll({
-            attributes: { exclude: ['password'] }
-        })
-        .then(dbUserData => res.json(dbUserData))
-        .catch(err => {
-            console.log(err);
-            res.status(500).json(err);
-        }
-    );
+        attributes: { exclude: ['password'] }
+    })
+    .then(dbUserData => res.json(dbUserData))
+    .catch(err => {
+        console.log(err);
+        res.status(500).json(err);
+    });
 });
 
 // GET /api/users/1
 router.get('/:id', (req, res) => {
     User.findOne({
         attributes: { exclude: ['password'] },
-        // replace the existing `include` with this
+        where: {
+            id: req.params.id
+        },
         include: [
             {
                 model: Post,
                 attributes: ['id', 'title', 'post_url', 'created_at']
+            },
+            // include the Comment model here:
+            {
+                model: Comment,
+                attributes: ['id', 'comment_text', 'created_at'],
+                include: {
+                    model: Post,
+                    attributes: ['title']
+                }
             },
             {
                 model: Post,
@@ -31,10 +41,7 @@ router.get('/:id', (req, res) => {
                 through: Vote,
                 as: 'voted_posts'
             }
-        ],
-        where: {
-            id: req.params.id
-        }
+        ]
     })
     .then(dbUserData => {
         if (!dbUserData) {
