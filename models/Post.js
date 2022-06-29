@@ -44,14 +44,14 @@ Post.init(
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
-            isURL: true
+                isURL: true
             }
         },
         user_id: {
             type: DataTypes.INTEGER,
             references: {
-            model: 'user',
-            key: 'id'
+                model: 'user',
+                key: 'id'
             }
         }
     },
